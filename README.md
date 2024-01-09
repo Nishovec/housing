@@ -1,8 +1,8 @@
 # Advanced Programming
 
-## RecipeHub
+## Housing
 
-> Description: Our service to discover recipes from other people to get new impressions
+> Description: Our website is designed for housing search
 
 ### Team Members:
 - Alisher Tokesh | SE-2217
