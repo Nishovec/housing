@@ -42,7 +42,6 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/users", getUsersHandler)
-	http.HandleFunc("/users/create", createUserHandler)
 	http.HandleFunc("/users/update", updateUserHandler)
 	http.HandleFunc("/users/delete", deleteUserHandler)
 
@@ -52,18 +51,105 @@ func main() {
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.New("index").Parse(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    <h1>Welcome to the Home Page</h1>
-    <a href="/register">Register</a>
-</body>
-</html>
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>Housing</title>
+			<style>
+					body {
+							font-family: Arial, sans-serif;
+							background-color: #f4f4f4;
+							margin: 0;
+							padding: 0;
+					}
+	
+					header {
+							background-color: #333;
+							color: #fff;
+							padding: 10px;
+							text-align: center;
+					}
+	
+					header a {
+							color: #fff;
+							text-decoration: none;
+							margin-right: 20px;
+					}
+	
+					header a:hover {
+							text-decoration: underline;
+					}
+	
+					.logo {
+							display: block;
+							margin: 20px auto;
+							max-width: 200px;
+					}
+	
+					.main-content {
+							max-width: 800px;
+							margin: 20px auto;
+							padding: 20px;
+							background-color: #fff;
+							border-radius: 10px;
+							box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+					}
+	
+					.block {
+							background-color: #e0e0e0;
+							padding: 20px;
+							margin: 20px 0;
+							border-radius: 10px;
+					}
+
+					.block-1 {
+						background-color: green;
+					}
+					
+					.block-2 {
+						background-color: orange;
+					}
+
+					.block-1 {
+						background-color: yellow;
+					}
+
+					.logo {
+						font-family: sans-serif;
+						font-size: 30px;
+					}
+			</style>
+	</head>
+	<body>
+			<header>
+					<a href="/">Home</a>
+					<a href="/register">Register</a>
+					<p class="logo">Housing</p>
+			</header>
+	
+			<div class="main-content">
+					<h1>Welcome to Housing</h1>
+	
+					<div class="block-1 block">
+							<h2>Search for Your Dream Home</h2>
+							<p>Explore properties in different locations and find the perfect home for you.</p>
+					</div>
+	
+					<div class="block block-2">
+							<h2>Featured Properties</h2>
+							<p>Discover our featured properties with beautiful images and detailed descriptions.</p>
+					</div>
+	
+					<div class="block block-3">
+							<h2>Get Started Today</h2>
+							<p>Register now to access exclusive features and save your favorite properties.</p>
+					</div>
+			</div>
+	</body>
+	</html>
+	
 `)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -86,6 +172,53 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+		<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+
+    form {
+        max-width: 400px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+</style>
 </head>
 <body>
     <h1>Register</h1>
@@ -174,39 +307,6 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonUsers)
-}
-
-func createUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var user User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-
-	user.ID = primitive.NewObjectID()
-	user.CreatedAt = time.Now()
-
-	collection := client.Database("housing").Collection("users")
-	_, err := collection.InsertOne(context.Background(), user)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	jsonUser, err := json.Marshal(user)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	w.Write(jsonUser)
 }
 
 func updateUserHandler(w http.ResponseWriter, r *http.Request) {
